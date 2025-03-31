@@ -4,6 +4,8 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
 
 # no modificar
@@ -37,12 +39,39 @@ def retrieve_phone_code(driver) -> str:
 class UrbanRoutesPage:
     from_field = (By.ID, 'from')
     to_field = (By.ID, 'to')
+    request_taxi_button = (By.CSS_SELECTOR, '.button.round')
+    comfort_icon = (By.XPATH, '//div[@class="tcard-title" and text()="Comfort"]')
+    np_number_field = (By.XPATH, '//div[@class="np-text" and text()="Número de teléfono"]')
+    phone_number_popup = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[1]/div/label')
+    phone_number_popup_write = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[1]/div/input')
+    phone_number_submit_button = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[2]/button')
+    sms_code_field_label = (By.XPATH, '/html/body/div[1]/div/div[1]/div[2]/div[2]/form/div[1]/div[1]/label')
+    sms_code_field_input = (By.XPATH, '/html/body/div[1]/div/div[1]/div[2]/div[2]/form/div[1]/div[1]/input')
+    sms_code_submit_button = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[2]/form/div[2]/button[1]')
+    phone_number_popup_close = (By.XPATH, '//div[@class="close-button section-close"]')
+
+    payment_method_main_button = (By.XPATH, '//div[@class="pp-text" and text()="Método de pago"]')
+    payment_method_popup_add_card_button = (By.XPATH, '//div[@class="pp-title" and text()="Agregar tarjeta"]')
+    payment_method_popup_add_card_field = (By.XPATH, '//input[@id="number"]')
+    payment_method_popup_add_card_code = (By.XPATH, '//input[@placeholder="12"]') #<input type="text" id="code" name="code" placeholder="12" class="card-input" value="">
+    payment_method_popup_final_add_button = (By.XPATH, '//button[@class="button full" and contains(text(), "Agregar")]') #<button type="submit" class="button full">Agregar</button>
+    payment_method_popup_click_to_focus = (By.XPATH, '//div[@class="head" and text()="Agregar tarjeta"]') #<div class="head">Agregar tarjeta</div>
+    payment_method_popup_close = (By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div[1]/button') #<button class="close-button section-close"></button>
+
+    message_driver_label = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[3]/div/label')
+    message_driver_input = (By.XPATH, '//*[@id="comment"]')
+
+    requests_blanket_tissues = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[4]/div[2]/div[1]/div/div[2]/div/span')
+    requests_icecream = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[4]/div[2]/div[3]/div/div[2]/div[1]/div/div[2]/div/div[3]')
+    confirm_taxi_request_button = (By.XPATH, '//*[@id="root"]/div/div[3]/div[4]/button')
 
     def __init__(self, driver):
         self.driver = driver
 
     def set_from(self, from_address):
-        self.driver.find_element(*self.from_field).send_keys(from_address)
+        WebDriverWait(self.driver, 5).until(
+            expected_conditions.presence_of_element_located(self.from_field)
+        ).send_keys(from_address)
 
     def set_to(self, to_address):
         self.driver.find_element(*self.to_field).send_keys(to_address)
@@ -53,6 +82,183 @@ class UrbanRoutesPage:
     def get_to(self):
         return self.driver.find_element(*self.to_field).get_property('value')
 
+    def set_route(self, address_from, address_to):
+        self.set_from(address_from)
+        self.set_to(address_to)
+
+    def get_request_taxi_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.request_taxi_button)
+        )
+
+    def set_request_taxi_button(self):
+        self.get_request_taxi_button().click()
+
+    def get_comfort_icon(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.comfort_icon)
+        )
+
+    def set_comfort_icon(self):
+        self.get_comfort_icon().click()
+
+    def get_np_number_field(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.presence_of_element_located(self.np_number_field)
+        )
+
+    def set_np_number_field(self):
+        self.get_np_number_field().click()
+
+    def get_phone_number_popup(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.phone_number_popup_write)
+        )
+
+    def set_phone_number_popup(self, phone_number):
+        input_field = self.get_phone_number_popup()
+        WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.phone_number_popup_write)
+        )
+        input_field.clear()  # Limpia el campo antes de escribir
+        input_field.send_keys(phone_number)
+
+    def get_phone_number_submit_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.phone_number_submit_button)
+            )
+
+    def set_phone_number_submit_button(self):
+        self.get_phone_number_submit_button().click()
+
+    def get_sms_code_field_label(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.sms_code_field_label)
+        )
+
+    def set_sms_code_field_label(self, sms_code):
+        input_field = WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.sms_code_field_input)
+        )
+        input_field.clear()
+        input_field.send_keys(sms_code)
+
+    def get_sms_code_submit_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.sms_code_submit_button)
+        )
+
+    def set_sms_code_submit_button(self):
+        self.get_sms_code_submit_button().click()
+
+    def get_payment_method_main_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_main_button)
+        )
+
+    def set_payment_method_main_button(self):
+        self.get_payment_method_main_button().click()
+
+    def get_payment_method_popup_add_card_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_popup_add_card_button)
+        )
+
+    def set_payment_method_popup_add_card_button(self):
+        self.get_payment_method_popup_add_card_button().click()
+
+    def get_payment_method_popup_add_card_field(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_popup_add_card_field)
+        )
+
+    def set_payment_method_popup_add_card_field(self, card_number):
+        input_field = WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_popup_add_card_field)
+        )
+        input_field.click()
+        input_field.clear()
+        input_field.send_keys(card_number)
+
+    def get_payment_method_popup_add_card_code(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_popup_add_card_code)
+        )
+
+    def set_payment_method_popup_add_card_code(self, card_code):
+        input_field = WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.payment_method_popup_add_card_code)
+        )
+        input_field.click()
+        input_field.clear()
+        input_field.send_keys(card_code)
+
+
+    def get_payment_method_popup_click_to_focus(self):
+        return WebDriverWait(self.driver, 5).until(
+        expected_conditions.element_to_be_clickable(self.payment_method_popup_click_to_focus)
+    )
+
+    def set_payment_method_popup_click_to_focus(self):
+         self.get_payment_method_popup_click_to_focus().click()
+
+    def get_payment_method_popup_final_add_button(self):
+        return WebDriverWait(self.driver, 5).until(
+        expected_conditions.element_to_be_clickable(self.payment_method_popup_final_add_button)
+    )
+
+    def set_payment_method_popup_final_add_button(self):
+         self.get_payment_method_popup_final_add_button().click()
+
+    def get_payment_method_popup_close(self):
+        return WebDriverWait(self.driver, 10).until(
+        expected_conditions.visibility_of_element_located(self.payment_method_popup_close)
+        )
+
+    def set_payment_method_popup_close(self):
+         self.get_payment_method_popup_close().click()
+
+    def get_message_driver_label(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.message_driver_label)
+        )
+
+    def set_message_driver_label(self, message):
+        input_field = WebDriverWait(self.driver, 5).until(
+            expected_conditions.element_to_be_clickable(self.message_driver_input)
+        )
+        input_field.clear()
+        input_field.send_keys(message)
+
+    def get_requests_blanket_tissues(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.requests_blanket_tissues)
+        )
+
+    def set_requests_blanket_tissues(self):
+         self.get_requests_blanket_tissues().click()
+
+    def get_requests_icecream(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.requests_icecream)
+        )
+
+    def set_requests_icecream(self):
+        element = self.get_requests_icecream()
+        element.click()
+        element.click()
+
+
+    def get_confirm_taxi_request_button(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.confirm_taxi_request_button)
+        )
+
+    def set_confirm_taxi_request_button(self):
+        WebDriverWait(self.driver, 10).until(
+            expected_conditions.visibility_of_element_located(self.confirm_taxi_request_button)
+        ).click()
+
 
 
 class TestUrbanRoutes:
@@ -61,21 +267,65 @@ class TestUrbanRoutes:
 
     @classmethod
     def setup_class(cls):
-        # no lo modifiques, ya que necesitamos un registro adicional habilitado para recuperar el código de confirmación del teléfono
-        from selenium.webdriver import DesiredCapabilities
-        capabilities = DesiredCapabilities.CHROME
-        capabilities["goog:loggingPrefs"] = {'performance': 'ALL'}
-        cls.driver = webdriver.Chrome(desired_capabilities=capabilities)
+        options = Options()
+        options.set_capability("goog:loggingPrefs", {'performance': 'ALL'})
+        cls.driver = webdriver.Chrome(service=Service(), options=options)
 
     def test_set_route(self):
         self.driver.get(data.urban_routes_url)
-        routes_page = UrbanRoutesPage(self.driver)
-        address_from = data.address_from
+        routes_page = UrbanRoutesPage(self.driver) #OBJETO. Vinculo entre la prueba y la página. Siempre debe crearse de la clase de interés, en este caso UrbanRoutes.
+        address_from = data.address_from #variable direccion desde. se convierte una en otra para interactuar con ella mas abajo.
         address_to = data.address_to
         routes_page.set_route(address_from, address_to)
         assert routes_page.get_from() == address_from
         assert routes_page.get_to() == address_to
 
+    def test_request_taxi(self):
+        self.test_set_route()
+        routes_page = UrbanRoutesPage(self.driver) #OBJETO para acceder a métodos
+        routes_page.set_request_taxi_button()
+        routes_page.set_comfort_icon()
+
+    def test_phone_number(self):
+        self.test_request_taxi()
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_np_number_field()
+        routes_page.set_phone_number_popup(data.phone_number)
+        routes_page.set_phone_number_submit_button()
+        sms_code = retrieve_phone_code(self.driver)
+        routes_page.set_sms_code_field_label(sms_code)
+        routes_page.set_sms_code_submit_button()
+
+    def test_add_card(self):
+        self.test_request_taxi()
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_payment_method_main_button()
+        routes_page.set_payment_method_popup_add_card_button()
+        card_number = data.card_number
+        card_code = data.card_code
+        routes_page.set_payment_method_popup_add_card_field(card_number)
+        routes_page.set_payment_method_popup_add_card_code(card_code)
+        routes_page.set_payment_method_popup_click_to_focus()
+        routes_page.set_payment_method_popup_final_add_button()
+        routes_page.set_payment_method_popup_close()
+
+    def test_message_driver(self):
+        self.test_request_taxi()
+        routes_page = UrbanRoutesPage(self.driver)
+        message = data.message_for_driver
+        routes_page.set_message_driver_label(message)
+
+    def test_requests_for_the_ride(self):
+        self.test_request_taxi()
+        self.test_add_card()
+        self.test_phone_number()
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_requests_blanket_tissues()
+        routes_page.set_requests_icecream()
+        routes_page.set_confirm_taxi_request_button()
+
+        import time
+        time.sleep(10)
 
     @classmethod
     def teardown_class(cls):
