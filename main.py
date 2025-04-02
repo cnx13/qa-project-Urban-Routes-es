@@ -315,17 +315,20 @@ class TestUrbanRoutes:
         message = data.message_for_driver
         routes_page.set_message_driver_label(message)
 
-    def test_requests_for_the_ride(self):
+    def test_add_blanket(self):
         self.test_request_taxi()
-        self.test_add_card()
-        self.test_phone_number()
         routes_page = UrbanRoutesPage(self.driver)
         routes_page.set_requests_blanket_tissues()
-        routes_page.set_requests_icecream()
-        routes_page.set_confirm_taxi_request_button()
 
-        import time
-        time.sleep(10)
+    def test_add_icecream(self):
+        self.test_request_taxi()
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_requests_icecream()
+
+    def test_request_ride_confirmation(self):
+        self.test_request_taxi()
+        routes_page = UrbanRoutesPage(self.driver)
+        routes_page.set_confirm_taxi_request_button()
 
     @classmethod
     def teardown_class(cls):

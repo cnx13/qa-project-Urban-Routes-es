@@ -1,63 +1,75 @@
-# Urban Routes Test Automation
+# Automatización de Pruebas de Urban Routes
 
-## Project Description
+Christian Apodaca. Proyecto Sprint 8.
 
-This project automates the testing of the Urban Routes web application using Selenium WebDriver. It covers various functionalities, including setting routes, requesting a taxi, adding a payment card, entering a phone number, and adding special requests for the ride.
+## Descripción del Proyecto
 
-## Technologies and Techniques
+Este proyecto automatiza las pruebas de la aplicación web Urban Routes utilizando Selenium WebDriver. Cubre varias funcionalidades, incluyendo la configuración de rutas, la solicitud de un taxi, la adición de una tarjeta de pago, la introducción de un número de teléfono y la adición de solicitudes especiales para el viaje.
 
--   **Python:** The primary programming language used for scripting the tests.
--   **Selenium WebDriver:** Used for automating web browser interactions.
--   **Chrome WebDriver:** Specifically used for controlling the Chrome browser.
--   **pytest:** A testing framework for writing and running tests.
--   **XPath and CSS Selectors:** Used for locating web elements.
--   **WebDriverWait and Expected Conditions:** Used for handling dynamic web elements and ensuring elements are interactable before actions.
--   **Page Object Model:** The `UrbanRoutesPage` class represents the web page and encapsulates its elements and actions.
--   **Logging (Performance):** Used to retrieve the SMS code from the network logs.
+## Tecnologías y Técnicas
 
-## Files
+-   **Python:** El lenguaje de programación principal utilizado para escribir los scripts de las pruebas.
+-   **Selenium WebDriver:** Utilizado para automatizar las interacciones del navegador web.
+-   **Chrome WebDriver:** Utilizado específicamente para controlar el navegador Chrome.
+-   **pytest:** Un marco de pruebas para escribir y ejecutar pruebas.
+-   **Selectores XPath y CSS:** Utilizados para localizar elementos web.
+-   **WebDriverWait y Condiciones Esperadas:** Utilizados para manejar elementos web dinámicos y asegurar que los elementos sean interactivos antes de las acciones.
+-   **Modelo de Objetos de Página (Page Object Model):** La clase `UrbanRoutesPage` representa la página web y encapsula sus elementos y acciones.
+-   **Registro (Rendimiento):** Utilizado para recuperar el código SMS de los registros de red.
 
--   **`main.py`:** Contains the test scripts and the `UrbanRoutesPage` class.
--   **`data.py`:** Contains test data such as URLs, addresses, phone numbers, and card details.
+## Archivos
 
-## Setup
+-   **`main.py`:** Contiene los scripts de prueba y la clase `UrbanRoutesPage`.
+-   **`data.py`:** Contiene datos de prueba como URLs, direcciones, números de teléfono y detalles de la tarjeta.
 
-1.  **Install Python:** Ensure you have Python 3.6 or later installed.
-2.  **Install Dependencies:** Run the following command to install the required Python packages:
+## Configuración
+
+1.  **Instalar Python:** Asegúrate de tener Python 3.6 o posterior instalado.
+2.  **Instalar Dependencias:** Ejecuta el siguiente comando para instalar los paquetes de Python requeridos:
 
     ```bash
     pip install selenium pytest
     ```
 
-3.  **Download ChromeDriver:** Download the ChromeDriver executable that matches your Chrome browser version and place it in a directory included in your system's PATH.
+3.  **Descargar ChromeDriver:** Descarga el ejecutable de ChromeDriver que coincida con la versión de tu navegador Chrome y colócalo en un directorio incluido en el PATH de tu sistema.
 
-## Running the Tests
+## Instalación y Uso de Librerías
 
-1.  **Navigate to the Project Directory:** Open your terminal and navigate to the directory containing `main.py` and `data.py`.
-2.  **Run pytest:** Execute the following command to run the tests:
+-   **Selenium:**
+    -      Instalación: `pip install selenium`
+    -      Uso: Importa las clases y funciones necesarias desde el módulo `selenium`, como `webdriver`, `By`, `WebDriverWait`, y `expected_conditions`.
+-   **pytest:**
+    -      Instalación: `pip install pytest`
+    -      Uso: Escribe funciones de prueba que comiencen con `test_` y ejecuta `pytest` en la terminal para descubrir y ejecutar las pruebas.
+
+## Ejecutar las Pruebas en la Terminal
+
+1.  **Navegar al Directorio del Proyecto:** Abre tu terminal y navega al directorio que contiene `main.py` y `data.py`.
+2.  **Ejecutar pytest:** Ejecuta el siguiente comando para ejecutar las pruebas:
 
     ```bash
     pytest main.py -v -s
     ```
 
-    -   `-v` (verbose) provides detailed output.
-    -   `-s` disables output capturing, allowing print statements to be displayed.
+    -   `-v` (verbose) proporciona una salida detallada.
+    -   `-s` deshabilita la captura de salida, permitiendo que se muestren las declaraciones de impresión.
 
-## Test Cases
+## Casos de Prueba
 
-The `main.py` file includes the following test cases:
+El archivo `main.py` incluye los siguientes casos de prueba:
 
--   `test_set_route`: Tests setting the "from" and "to" addresses.
--   `test_request_taxi`: Tests requesting a taxi and selecting the "Comfort" option.
--   `test_phone_number`: Tests entering a phone number and verifying the SMS code.
--   `test_add_card`: Tests adding a payment card.
--   `test_message_driver`: Tests entering a message for the driver.
--   `test_requests_for_the_ride`: Tests adding special requests for the ride.
+-   `test_set_route`: Prueba la configuración de las direcciones "desde" y "hasta".
+-   `test_request_taxi`: Prueba la solicitud de un taxi y la selección de la opción "Comfort".
+-   `test_phone_number`: Prueba la introducción de un número de teléfono y la verificación del código SMS.
+-   `test_add_card`: Prueba la adición de una tarjeta de pago.
+-   `test_message_driver`: Prueba la introducción de un mensaje para el conductor.
+-   `test_add_blanket`: Prueba la funcionalidad de agregar una solicitud de manta/pañuelos.
+-   `test_add_icecream`: Prueba la funcionalidad de agregar una solicitud de helado.
+-   `test_request_ride_confirmation`: Prueba la funcionalidad de confirmar la solicitud del viaje.
 
-## Important Notes
+## Notas Importantes
 
--   The `retrieve_phone_code` function is used to extract the SMS verification code from the network logs. This function should only be called after the application has requested the code.
--   Ensure that the ChromeDriver version matches your Chrome browser version to avoid compatibility issues.
--   The tests assume that the web application is running at the URL specified in `data.py`.
--   The `time.sleep(10)` function at the end of the `test_requests_for_the_ride` test case is used to allow time for the application to process the request. Adjust the sleep time as needed.
--   The XPaths used in the code are very specific, if the application UI changes, the XPaths will need to be updated.
+-   La función `retrieve_phone_code` se utiliza para extraer el código de verificación SMS de los registros de red. Esta función solo debe llamarse después de que la aplicación haya solicitado el código.
+-   Asegúrate de que la versión de ChromeDriver coincida con la versión de tu navegador Chrome para evitar problemas de compatibilidad.
+-   Las pruebas asumen que la aplicación web se está ejecutando en la URL especificada en `data.py`.
+-   Los XPaths utilizados en el código son muy específicos, si la interfaz de usuario de la aplicación cambia, los XPaths deberán actualizarse.
