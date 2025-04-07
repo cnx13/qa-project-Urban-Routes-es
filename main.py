@@ -1,6 +1,3 @@
-import time
-import timeit
-
 import data
 from selenium import webdriver
 from selenium.webdriver import Keys
