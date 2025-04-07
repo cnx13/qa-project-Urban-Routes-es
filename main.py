@@ -1,3 +1,6 @@
+import time
+import timeit
+
 import data
 from selenium import webdriver
 from selenium.webdriver import Keys
@@ -41,7 +44,9 @@ class UrbanRoutesPage:
     to_field = (By.ID, 'to')
     request_taxi_button = (By.CSS_SELECTOR, '.button.round')
     comfort_icon = (By.XPATH, '//div[@class="tcard-title" and text()="Comfort"]')
+
     np_number_field = (By.XPATH, '//div[@class="np-text" and text()="Número de teléfono"]')
+    np_number_field_full = (By.XPATH, '//div[@class="np-text" and text()="+1 123 123 12 12"]') #<div class="np-text">+1 123 123 12 12</div>
     phone_number_popup = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[1]/div/label')
     phone_number_popup_write = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[1]/div/input')
     phone_number_submit_button = (By.XPATH, '/html/body/div/div/div[1]/div[2]/div[1]/form/div[2]/button')
@@ -57,13 +62,19 @@ class UrbanRoutesPage:
     payment_method_popup_final_add_button = (By.XPATH, '//button[@class="button full" and contains(text(), "Agregar")]') #<button type="submit" class="button full">Agregar</button>
     payment_method_popup_click_to_focus = (By.XPATH, '//div[@class="head" and text()="Agregar tarjeta"]') #<div class="head">Agregar tarjeta</div>
     payment_method_popup_close = (By.XPATH, '//*[@id="root"]/div/div[2]/div[2]/div[1]/button') #<button class="close-button section-close"></button>
+    payment_method_main_button_full = (By.XPATH, '//div[@class="pp-value-text" and text()="Tarjeta"]') #<div class="pp-value-text">Tarjeta</div>
 
     message_driver_label = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[3]/div/label')
     message_driver_input = (By.XPATH, '//*[@id="comment"]')
 
-    requests_blanket_tissues = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[4]/div[2]/div[1]/div/div[2]/div/span')
-    requests_icecream = (By.XPATH, '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[4]/div[2]/div[3]/div/div[2]/div[1]/div/div[2]/div/div[3]')
+    requests_blanket_tissues = (By.XPATH, '//div[contains(text(), "Manta y pañuelos")]/following::span[@class="slider round"][1]')
+    requests_blanket_tissues_color = (By.XPATH, '//span[@class="slider round"]')#<span class="slider round"></span>
+
+    requests_icecream = (By.XPATH, '//div[@class="counter-plus"]')  # <div class="counter-plus">+</div>  '//*[@id="root"]/div/div[3]/div[3]/div[2]/div[2]/div[4]/div[2]/div[3]/div/div[2]/div[1]/div/div[2]/div/div[3]')
+    requests_icecream_counter = (By.XPATH, '//div[@class="counter-value"]') #<div class="counter-value">0</div>
+
     confirm_taxi_request_button = (By.XPATH, '//*[@id="root"]/div/div[3]/div[4]/button')
+    searching_driver_popup = (By.XPATH, '//div[@class="order-header-title" and contains(text(), "Buscar automóvil")]') #<div class="order-header-title">Buscar automóvil</div>
 
     def __init__(self, driver):
         self.driver = driver
@@ -109,6 +120,11 @@ class UrbanRoutesPage:
 
     def set_np_number_field(self):
         self.get_np_number_field().click()
+
+    def get_np_number_field_full(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.presence_of_element_located(self.np_number_field_full)
+        )
 
     def get_phone_number_popup(self):
         return WebDriverWait(self.driver, 5).until(
@@ -218,6 +234,11 @@ class UrbanRoutesPage:
     def set_payment_method_popup_close(self):
          self.get_payment_method_popup_close().click()
 
+    def get_payment_method_main_button_full(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.presence_of_element_located(self.payment_method_main_button_full)
+        )
+
     def get_message_driver_label(self):
         return WebDriverWait(self.driver, 5).until(
             expected_conditions.visibility_of_element_located(self.message_driver_label)
@@ -229,6 +250,11 @@ class UrbanRoutesPage:
         )
         input_field.clear()
         input_field.send_keys(message)
+
+    def get_message_driver_input(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.message_driver_input)
+        )
 
     def get_requests_blanket_tissues(self):
         return WebDriverWait(self.driver, 5).until(
@@ -248,6 +274,10 @@ class UrbanRoutesPage:
         element.click()
         element.click()
 
+    def get_requests_icecream_counter(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.requests_icecream_counter)
+        )
 
     def get_confirm_taxi_request_button(self):
         return WebDriverWait(self.driver, 5).until(
@@ -259,7 +289,10 @@ class UrbanRoutesPage:
             expected_conditions.visibility_of_element_located(self.confirm_taxi_request_button)
         ).click()
 
-
+    def get_searching_driver_popup(self):
+        return WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(self.searching_driver_popup)
+        )
 
 class TestUrbanRoutes:
 
@@ -285,6 +318,9 @@ class TestUrbanRoutes:
         routes_page = UrbanRoutesPage(self.driver) #OBJETO para acceder a métodos
         routes_page.set_request_taxi_button()
         routes_page.set_comfort_icon()
+        assert WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(routes_page.np_number_field)
+        )
 
     def test_phone_number(self):
         self.test_request_taxi()
@@ -295,6 +331,8 @@ class TestUrbanRoutes:
         sms_code = retrieve_phone_code(self.driver)
         routes_page.set_sms_code_field_label(sms_code)
         routes_page.set_sms_code_submit_button()
+        assert routes_page.get_np_number_field_full().text == data.phone_number
+
 
     def test_add_card(self):
         self.test_request_taxi()
@@ -308,27 +346,43 @@ class TestUrbanRoutes:
         routes_page.set_payment_method_popup_click_to_focus()
         routes_page.set_payment_method_popup_final_add_button()
         routes_page.set_payment_method_popup_close()
+        assert WebDriverWait(self.driver, 5).until(
+            expected_conditions.visibility_of_element_located(routes_page.payment_method_main_button_full)
+        )
 
     def test_message_driver(self):
         self.test_request_taxi()
         routes_page = UrbanRoutesPage(self.driver)
         message = data.message_for_driver
         routes_page.set_message_driver_label(message)
+        assert routes_page.get_message_driver_input().get_property('value') == message
 
     def test_add_blanket(self):
         self.test_request_taxi()
         routes_page = UrbanRoutesPage(self.driver)
+        color_before = routes_page.get_requests_blanket_tissues().value_of_css_property("background-color")
         routes_page.set_requests_blanket_tissues()
+        WebDriverWait(self.driver, 5).until(
+        lambda driver: routes_page.get_requests_blanket_tissues().value_of_css_property("background-color") != color_before
+    )
+        color_after = routes_page.get_requests_blanket_tissues().value_of_css_property("background-color")
+        assert color_before != color_after
 
     def test_add_icecream(self):
         self.test_request_taxi()
         routes_page = UrbanRoutesPage(self.driver)
         routes_page.set_requests_icecream()
+        assert routes_page.get_requests_icecream_counter().text == '2'
 
     def test_request_ride_confirmation(self):
         self.test_request_taxi()
         routes_page = UrbanRoutesPage(self.driver)
         routes_page.set_confirm_taxi_request_button()
+        assert WebDriverWait(self.driver, 5).until(
+             expected_conditions.visibility_of_element_located(routes_page.searching_driver_popup)
+        )
+
+
 
     @classmethod
     def teardown_class(cls):
